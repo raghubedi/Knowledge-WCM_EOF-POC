@@ -8,7 +8,7 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 
 const CONTENT_TYPE_ID = "tiqImageTemplate2";
 
-const projectRoot = path.resolve(__dirname, '../..');
+const projectRoot = path.resolve(__dirname, '..');
 const LARGE_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/200');
 const MEDIUM_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/100');
 const SMALL_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/65');
