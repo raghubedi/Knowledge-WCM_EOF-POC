@@ -1,0 +1,17 @@
+{
+  "name": "contentful-image-upload",
+  "version": "1.0.0",
+  "description": "A script to upload images to Contentful from GitHub repo",
+  "main": "uploadImages.js",
+  "scripts": {
+    "start": "node uploadImages.js"
+  },
+  "dependencies": {
+    "contentful-management": "^10.19.0",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
