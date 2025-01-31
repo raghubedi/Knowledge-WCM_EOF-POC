@@ -7,7 +7,6 @@ const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 
 const CONTENT_TYPE_ID = "tiqImageTemplate2";
-const __dirname = "C:/GCP_projects/Contentful/nodeJS-POC/Knowledge-WCM_EOF-POC/DeviceImages/"
 const LARGE_IMAGE_FOLDER_PATH = path.join(__dirname, "images/200");
 const MEDIUM_IMAGE_FOLDER_PATH = path.join(__dirname, "images/100");
 const SMALL_IMAGE_FOLDER_PATH = path.join(__dirname, "images/65");
