@@ -1,9 +1,9 @@
-name: Upload Images to Contentful
+name: Upload Device Images to Contentful
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:  # Allows manual trigger
 
 jobs:

@@ -1,27 +1,20 @@
 const fs = require("fs");
 const path = require("path");
-const contentful = require("contentful-management");
-
-const SPACE_ID = process.env.SPACE_ID;
-const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const { getContentfulEnvironment } = require("../contentful/ContentfulEnv");
 
 const CONTENT_TYPE_ID = "tiqImageTemplate2";
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '../..');
+console.log(`projectRoot: ${projectRoot}`);
 const LARGE_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/200');
 const MEDIUM_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/100');
 const SMALL_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/65');
-
-const client = contentful.createClient({
-  accessToken: ACCESS_TOKEN,
-});
+console.log(`LARGE_IMAGE_FOLDER_PATH: ${LARGE_IMAGE_FOLDER_PATH}`);
 
 async function uploadImagesToContentful(imagesPath) {
   console.log("Uploading Images start...");
   try {
-    const space = await client.getSpace(SPACE_ID);
-    const environment = await space.getEnvironment(ENVIRONMENT_ID);
+    const environment = await getContentfulEnvironment();
 
     const files = fs.readdirSync(imagesPath).filter((file) =>
       /\.(jpg|jpeg|png)$/i.test(file)
