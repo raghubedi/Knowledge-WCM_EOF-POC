@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { getContentfulEnvironment } = require("../contentful/ContentfulEnv");
+const {productCodeToColor} = require("../constants/constants");
 
 const CONTENT_TYPE_ID = "tiqImageTemplate2";
 
@@ -9,8 +10,18 @@ console.log(`projectRoot: ${projectRoot}`);
 const LARGE_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/200');
 const MEDIUM_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/100');
 const SMALL_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/65');
-console.log(`LARGE_IMAGE_FOLDER_PATH: ${LARGE_IMAGE_FOLDER_PATH}`);
 
+const getSizeLabel = (imagesPath) => {
+  let sizeLabel;
+  if (imagesPath === LARGE_IMAGE_FOLDER_PATH) {
+    sizeLabel = 'large';
+  } else if (imagesPath === MEDIUM_IMAGE_FOLDER_PATH) {
+    sizeLabel = 'medium';
+  } else if (imagesPath === SMALL_IMAGE_FOLDER_PATH) {
+    sizeLabel = 'small';
+  }
+  return sizeLabel;
+}
 async function uploadImagesToContentful(imagesPath) {
   console.log("Uploading Images start...");
   try {
@@ -29,7 +40,7 @@ async function uploadImagesToContentful(imagesPath) {
       console.log(`📤 Processing: ${file}`);
       const assetId = await checkAndUploadImage(environment, imagesPath, file);
       if (assetId) {
-        await createOrUpdateImageContent(environment, assetId, imagesPath, file);
+        await createOrUpdateImageContent(environment, assetId, getSizeLabel(imagesPath), file);
       }
     }
 
@@ -131,9 +142,9 @@ async function waitForProcessing(asset, environment) {
 }
 
 
-async function createOrUpdateImageContent(environment, assetId, imagesPath, fileName) {
+async function createOrUpdateImageContent(environment, assetId, sizeLabel, fileName) {
   const skuCd = path.basename(fileName, path.extname(fileName));
-  console.log(`Inside createOrUpdateImageContent ... with skuCd: ${skuCd}, imagesPath: ${imagesPath}`);
+  console.log(`Inside createOrUpdateImageContent ... with skuCd: ${skuCd}, sizeLabel: ${sizeLabel}`);
 
   try {
     // Check if entry already exists
@@ -147,56 +158,62 @@ async function createOrUpdateImageContent(environment, assetId, imagesPath, file
     if (entry) {
       console.log(`🔄 Entry already exists for ${skuCd}. Updating...`);
       console.log(`Inside createOrUpdateImageContent ... with skuCd: ${skuCd}`);
-      if (imagesPath === LARGE_IMAGE_FOLDER_PATH) {
-        entry.fields.largeImage["en-CA"] = { sys: { type: "Link", linkType: "Asset", id: assetId } };
-      } else if (imagesPath === MEDIUM_IMAGE_FOLDER_PATH) {
-        entry.fields.mediumImage["en-CA"] = { sys: { type: "Link", linkType: "Asset", id: assetId } };
-      } else if (imagesPath === SMALL_IMAGE_FOLDER_PATH) {
-        entry.fields.smallImage["en-CA"] = { sys: { type: "Link", linkType: "Asset", id: assetId } };
-      }
+      
+      entry.fields[`${sizeLabel}Image`] = { "en-CA": { sys: { type: "Link", linkType: "Asset", id: assetId } } };
       entry = await entry.update();
     } else {
       console.log(`📤 Creating new entry for ${skuCd}`);
-      if (imagesPath === LARGE_IMAGE_FOLDER_PATH) {
-        entry = await environment.createEntry(CONTENT_TYPE_ID, {
-          fields: {
-            id: { "en-CA": skuCd },
-            skuCode: { "en-CA": skuCd },
-            largeImage: { "en-CA": { sys: { type: "Link", linkType: "Asset", id: assetId } } },
-            mediumImage: { "en-CA": { sys: { type: "Link", linkType: "Asset" } } },
-            smallImage: { "en-CA": { sys: { type: "Link", linkType: "Asset"} } },
-          },
-        });
-      } else if (imagesPath === MEDIUM_IMAGE_FOLDER_PATH) {
-        entry = await environment.createEntry(CONTENT_TYPE_ID, {
-          fields: {
-            id: { "en-CA": skuCd },
-            skuCode: { "en-CA": skuCd },
-            largeImage: { "en-CA": { sys: { type: "Link", linkType: "Asset"} } },
-            mediumImage: { "en-CA": { sys: { type: "Link", linkType: "Asset", id: assetId } } },
-            smallImage: { "en-CA": { sys: { type: "Link", linkType: "Asset" } } },
-          },
-        });
-      } else if (imagesPath === SMALL_IMAGE_FOLDER_PATH) {
-        entry = await environment.createEntry(CONTENT_TYPE_ID, {
-          fields: {
-            id: { "en-CA": skuCd },
-            skuCode: { "en-CA": skuCd },
-            largeImage: { "en-CA": { sys: { type: "Link", linkType: "Asset"} } },
-            mediumImage: { "en-CA": { sys: { type: "Link", linkType: "Asset"} } },
-            smallImage: { "en-CA": { sys: { type: "Link", linkType: "Asset", id: assetId } } },
-          },
-        });
-      }
-      
+      entry = await environment.createEntry(CONTENT_TYPE_ID, {
+        fields: {
+          id: { "en-CA": skuCd },
+          skuCode: { "en-CA": skuCd },
+          largeImage: { "en-CA": sizeLabel === "large" ? { sys: { type: "Link", linkType: "Asset", id: assetId } } : { sys: { type: "Link", linkType: "Asset"} } },
+          mediumImage: { "en-CA": sizeLabel === "medium" ? { sys: { type: "Link", linkType: "Asset", id: assetId } } : { sys: { type: "Link", linkType: "Asset"} } },
+          smallImage: { "en-CA": sizeLabel === "small" ? { sys: { type: "Link", linkType: "Asset", id: assetId } } : { sys: { type: "Link", linkType: "Asset"} } },
+        },
+      });
     }
-    console.log(`Entry: ${JSON.stringify(entry)}`)
 
+    console.log(`Entry: ${JSON.stringify(entry)}`)
+    if (!entry?.fields?.swatchImage) {
+      console.log('SWATCH NEEDS TO BE CREATED!!');
+      const swatchAsset = await getSwatchImageBySkuCode(environment, skuCd);
+      if (swatchAsset) {
+        console.log(`swatchAsset: ${swatchAsset?.sys?.id}`)
+        entry.fields[`swatchImage`] = { "en-CA": { sys: { type: "Link", linkType: "Asset", id: swatchAsset.sys.id } } };
+        entry = await entry.update();
+        console.log(`✅ Swatch Created !!`);
+      } else {
+        console.log(`NO SWATCH ASSET`);
+      }
+    } else {
+      console.log('SWATCH Already existing for this content!!')
+    }
     await entry.publish();
     console.log(`✅ Entry created & published with image: ${skuCd}`);
   } catch (error) {
     console.error(`❌ Error creating/updating entry for ${skuCd}:`, error);
   }
+}
+
+const getSwatchImageBySkuCode = async (environment, skuCode) => {
+  let productColorCode = "BK";
+  
+  const subCode = skuCode.slice(-2);
+  console.log(`subCode: ${subCode}`)
+  if (productCodeToColor.hasOwnProperty(subCode)) {
+    productColorCode = subCode;
+  }
+  console.log(`productColorCode: ${productColorCode}`)
+  const swatchImageTitle = productCodeToColor[productColorCode];
+  console.log(`swatchImageTitle: ${swatchImageTitle}`)
+  const assets = await environment.getAssets({ "fields.title[match]": swatchImageTitle });
+  let asset = assets.items.length > 0 ? assets.items[0] : null;
+  if (!asset) {
+    console.log(`Swatch image doesnt exist for this Product : ${skuCode}`);
+  }
+  
+  return asset;
 }
 
 function getContentType(fileName) {
