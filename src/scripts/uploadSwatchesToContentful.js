@@ -122,7 +122,7 @@ function getContentType(fileName) {
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
     ".png": "image/png",
-    "gif": "image/gif"
+    ".gif": "image/gif"
     };
   return types[ext] || "application/octet-stream";
 }

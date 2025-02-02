@@ -24,15 +24,23 @@ const getSizeLabel = (imagesPath) => {
 }
 async function uploadImagesToContentful(imagesPath) {
   console.log("Uploading Images start...");
+  const uploadFromDate = process.env.UPLOAD_FROM_DATE; // e.g., "2024-01-01"
+  const uploadFromTimestamp = new Date(uploadFromDate).getTime();
+  console.log(`Uploading Images created on or after ${uploadFromDate}`);
   try {
     const environment = await getContentfulEnvironment();
 
-    const files = fs.readdirSync(imagesPath).filter((file) =>
-      /\.(jpg|jpeg|png)$/i.test(file)
-    );
+    const files = fs.readdirSync(imagesPath).filter((file) => {
+      const filePath = path.join(imagesPath, file);
+      const stats = fs.statSync(filePath);
+      return (
+        /\.(jpg|jpeg|png|gif)$/i.test(file) &&
+        stats.birthtime.getTime() >= uploadFromTimestamp
+      );
+    });
 
     if (files.length === 0) {
-      console.log("❌ No images found in the folder!");
+      console.log(`❌ No images found after date ${uploadFromDate}`);
       return;
     }
 
@@ -218,7 +226,12 @@ const getSwatchImageBySkuCode = async (environment, skuCode) => {
 
 function getContentType(fileName) {
   const ext = path.extname(fileName).toLowerCase();
-  const types = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png" };
+  const types = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".gif": "image/gif"
+    };
   return types[ext] || "application/octet-stream";
 }
 
