@@ -35,10 +35,10 @@ async function uploadImagesToContentful(imagesPath) {
       const filePath = path.join(imagesPath, file);
       const stats = fs.statSync(filePath);
       console.log(`stats : ${JSON.stringify(stats)}`)
-      console.log(`stats.birthtime.getTime : ${stats.birthtime.getTime()}`)
+      console.log(`stats.mtime.getTime : ${stats.mtime.getTime()}`)
       return (
         /\.(jpg|jpeg|png|gif)$/i.test(file) &&
-        stats.birthtime.getTime() >= uploadFromTimestamp
+        stats.mtime.getTime() >= uploadFromTimestamp
       );
     });
 
