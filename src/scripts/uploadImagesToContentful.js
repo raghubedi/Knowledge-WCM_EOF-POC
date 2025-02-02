@@ -3,7 +3,7 @@ const path = require("path");
 const { getContentfulEnvironment } = require("../contentful/ContentfulEnv");
 const {productCodeToColor} = require("../constants/constants");
 
-const CONTENT_TYPE_ID = "tiqImageTemplate2";
+const CONTENT_TYPE_ID = "tiqImageTemplate";
 
 const projectRoot = path.resolve(__dirname, '../..');
 console.log(`projectRoot: ${projectRoot}`);
@@ -27,12 +27,15 @@ async function uploadImagesToContentful(imagesPath) {
   const uploadFromDate = process.env.UPLOAD_FROM_DATE || "2020-01-01";
   const uploadFromTimestamp = new Date(uploadFromDate).getTime();
   console.log(`Uploading Images created on or after ${uploadFromDate}`);
+  console.log(`uploadFromTimestamp ${uploadFromTimestamp}`);
   try {
     const environment = await getContentfulEnvironment();
 
     const files = fs.readdirSync(imagesPath).filter((file) => {
       const filePath = path.join(imagesPath, file);
       const stats = fs.statSync(filePath);
+      console.log(`stats : ${JSON.stringify(stats)}`)
+      console.log(`stats.birthtime.getTime : ${stats.birthtime.getTime()}`)
       return (
         /\.(jpg|jpeg|png|gif)$/i.test(file) &&
         stats.birthtime.getTime() >= uploadFromTimestamp
