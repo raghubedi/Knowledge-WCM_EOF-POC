@@ -30,4 +30,4 @@ jobs:
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
           UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}  # Pass date as an environment variable
-        run: node src/uploadImagesToContentful.js
+        run: node src/scripts/uploadImagesToContentful.js
