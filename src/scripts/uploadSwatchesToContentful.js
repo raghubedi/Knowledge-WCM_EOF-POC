@@ -15,8 +15,8 @@ async function uploadSwatchesToContentful() {
   try {
     const environment = await getContentfulEnvironment();
 
-    const files = fs.readdirSync(imagesPath).filter((file) => {
-        const filePath = path.join(imagesPath, file);
+    const files = fs.readdirSync(SWATCH_IMAGE_FOLDER_PATH).filter((file) => {
+        const filePath = path.join(SWATCH_IMAGE_FOLDER_PATH, file);
         const stats = fs.statSync(filePath);
         return (
           /\.(jpg|jpeg|png|gif)$/i.test(file) &&
