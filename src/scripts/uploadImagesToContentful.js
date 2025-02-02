@@ -24,7 +24,7 @@ const getSizeLabel = (imagesPath) => {
 }
 async function uploadImagesToContentful(imagesPath) {
   console.log("Uploading Images start...");
-  const uploadFromDate = process.env.UPLOAD_FROM_DATE || "2020-01-01";
+  const uploadFromDate = process.env.UPLOAD_FROM_DATE+'T00:00:00.000Z' || "2025-02-02T00:00:00.000Z";
   const uploadFromTimestamp = new Date(uploadFromDate).getTime();
   console.log(`Uploading Images created on or after ${uploadFromDate}`);
   console.log(`uploadFromTimestamp ${uploadFromTimestamp}`);
