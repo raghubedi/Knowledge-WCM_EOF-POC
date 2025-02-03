@@ -33,24 +33,12 @@ jobs:
           UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
         run: node src/scripts/uploadImagesToContentful.js
 
-  wait-for-approval:
-    name: Manual Approval for Production
-    runs-on: ubuntu-latest
-    needs: upload-to-pt
-    steps:
-      - name: Await Approval
-        uses: hmarr/auto-approve-action@v3
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-    environment:
-      name: Prod
-    approval: true
-
   upload-to-prod:
     name: Upload Images to Prod
     runs-on: ubuntu-latest
-    needs: wait-for-approval
+    needs: upload-to-pt
+    environment:
+      name: Prod
 
     steps:
       - name: Checkout Repository
