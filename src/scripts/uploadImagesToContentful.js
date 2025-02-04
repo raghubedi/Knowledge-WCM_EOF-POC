@@ -34,9 +34,12 @@ async function uploadImagesToContentful(imagesPath) {
 
     const files = fs.readdirSync(imagesPath).filter((file) => {
       const filePath = path.join(imagesPath, file);
+      console.log(`filePath: ${filePath}`)
       
       try {
-        const gitLog = execSync(`git log --follow --diff-filter=A --format="%cd" --date=iso-strict -- "${filePath}"`).toString().trim();
+        const fetchGitlogCommand = `git log --follow --diff-filter=A --format="%cd" --date=iso-strict -- "${filePath}"`;
+        console.log(`fetchGitlogCommand: ${fetchGitlogCommand}`);
+        const gitLog = execSync(fetchGitlogCommand).toString().trim();
         console.log(`gitLogs: ${JSON.stringify(gitLog)}`);
         const commitTimestamp = new Date(gitLog).getTime();
 
