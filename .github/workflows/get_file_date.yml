@@ -14,7 +14,7 @@ jobs:
 
       - name: List files
         working-directory: ./repo
-        run: ls -l repo/DeviceImages/200/LAIP12P128SL.jpg
+        run: ls -l DeviceImages/200/LAIP12P128SL.jpg
 
       - name: Get file date
         working-directory: ./repo
