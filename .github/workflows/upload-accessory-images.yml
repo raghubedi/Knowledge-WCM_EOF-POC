@@ -1,4 +1,4 @@
-name: Upload Device Images to Contentful
+name: Upload Accessory Images to Contentful
 
 on:
   workflow_dispatch:
