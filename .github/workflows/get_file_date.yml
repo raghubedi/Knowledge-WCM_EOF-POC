@@ -10,9 +10,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: repo
-          ref: main
+          # No need to specify ref here; it defaults to the triggering branch
+          # which is what you want in this case.
 
-      - name: List files
+      - name: List files (for debugging)
         working-directory: ./repo
         run: ls -l DeviceImages/200/LAIP12P128SL.jpg
 
@@ -22,8 +23,20 @@ jobs:
           export TZ=UTC
           date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
           echo "File date (UTC): $date"
-    
+
       - name: Verify commit (for debugging)
         working-directory: ./repo
         run: |
           git log -p "DeviceImages/200/LAIP12P128SL.jpg"
+
+      # Optional: Set the date as an output
+      - name: Set output
+        id: set_date
+        working-directory: ./repo
+        run: |
+          export TZ=UTC
+          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
+          echo "date=$date" >> $GITHUB_OUTPUT
+
+      - name: Use the output
+        run: echo "The file date is ${{ steps.set_date.outputs.date }}"
