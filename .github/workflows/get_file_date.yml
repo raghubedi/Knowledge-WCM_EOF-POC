@@ -10,9 +10,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: repo
+          ref: main
 
       - name: Get file date
         working-directory: ./repo
         run: |
-          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 -- "DeviceImages/200/LAIP12P128SL.jpg")
-          echo "File date: $date"
+          export TZ=UTC  # Set timezone explicitly (important!)
+          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
+          echo "File date (UTC): $date"
+
+      - name: Verify commit (for debugging)
+        working-directory: ./repo
+        run: |
+          git log -p "DeviceImages/200/LAIP12P128SL.jpg"  # Check commit details
