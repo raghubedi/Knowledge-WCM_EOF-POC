@@ -8,35 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: repo
-          # No need to specify ref here; it defaults to the triggering branch
-          # which is what you want in this case.
-
-      - name: List files (for debugging)
-        working-directory: ./repo
-        run: ls -l DeviceImages/200/LAIP12P128SL.jpg
 
       - name: Get file date
+        id: set_date  # Assign an ID to the step
         working-directory: ./repo
         run: |
-          export TZ=UTC
-          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
-          echo "File date (UTC): $date"
+          date_utc=$(git log -n 1 --format="%cd" --date=iso-strict --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | cut -d ' ' -f 1-4)
+          echo "date=$date_utc" >> $GITHUB_OUTPUT
+
+      - name: Use the output
+        run: echo "The file date (UTC) is ${{ steps.set_date.outputs.date }}"
 
       - name: Verify commit (for debugging)
         working-directory: ./repo
-        run: |
-          git log -p "DeviceImages/200/LAIP12P128SL.jpg"
-
-      # Optional: Set the date as an output
-      - name: Set output
-        id: set_date
-        working-directory: ./repo
-        run: |
-          export TZ=UTC
-          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
-          echo "date=$date" >> $GITHUB_OUTPUT
-
-      - name: Use the output
-        run: echo "The file date is ${{ steps.set_date.outputs.date }}"
+        run: git log -p "DeviceImages/200/LAIP12P128SL.jpg"
