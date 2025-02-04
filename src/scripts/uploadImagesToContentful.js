@@ -25,6 +25,7 @@ const getSizeLabel = (imagesPath) => {
 }
 async function uploadImagesToContentful(imagesPath) {
   console.log("Uploading Images start...");
+  console.log(`Scanning ${imagesPath}`);
   try {
     const environment = await getContentfulEnvironment();
 
