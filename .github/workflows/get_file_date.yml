@@ -8,11 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: repo  # Checkout to the 'repo' directory
 
       - name: Get file date
         id: set_date
         run: |
-          cd ./repo
+          REPO_DIR="${{ github.workspace }}/repo" # Construct the absolute path
+          cd "$REPO_DIR"  # Use the absolute path to change directory
           date_utc=$(git log -n 1 --format="%cd" --date=iso-strict --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | cut -d ' ' -f 1-4)
           echo "date=$date_utc" >> $GITHUB_OUTPUT
 
