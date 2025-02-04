@@ -9,7 +9,8 @@ on:
         default: '2000-01-01'
 
 jobs:
-  upload-images:
+  upload-to-pt:
+    name: Upload Swatches to PT
     runs-on: ubuntu-latest
 
     steps:
@@ -24,10 +25,37 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Upload Script
+      - name: Run Upload Swatches script
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
-          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_ENV_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+          UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
+        run: node src/scripts/uploadSwatchesToContentful.js
+
+  upload-to-prod:
+    name: Upload Swatches to Prod
+    runs-on: ubuntu-latest
+    needs: upload-to-pt
+    environment:
+      name: Prod
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Upload Swatches script
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
           UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
         run: node src/scripts/uploadSwatchesToContentful.js

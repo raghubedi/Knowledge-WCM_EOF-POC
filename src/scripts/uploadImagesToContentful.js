@@ -34,31 +34,14 @@ async function uploadImagesToContentful(imagesPath) {
 
     const files = fs.readdirSync(imagesPath).filter((file) => {
       const filePath = path.join(imagesPath, file);
-      console.log(`filePath: ${filePath}`)
       
-      try {
-        const fetchGitlogCommand = `git log --diff-filter=A --format="%cd" --date=iso-strict --find-copies-harder -1 -- "${filePath}"`;
-        console.log(`fetchGitlogCommand: ${fetchGitlogCommand}`);
-        const gitLog = execSync(fetchGitlogCommand).toString().trim();
-        console.log(`gitLog: ${JSON.stringify(gitLog)}`);
-
-        if (!gitLog) {
-            console.warn(`⚠️ No git log found for: ${file}`);
-            return false;
-        }
-
-        const commitTimestamp = new Date(gitLog).getTime();
-
-        console.log(`File: ${file}, Commit Date: ${new Date(commitTimestamp)}`);
-
-        return (
-            /\.(jpg|jpeg|png|gif)$/i.test(file) &&
-            commitTimestamp >= uploadFromTimestamp
-        );
-    } catch (error) {
-        console.error(`⚠️ Error retrieving commit date for: ${file}`, error); // Log the full error for debugging
-        return false;
-    }
+      const stats = fs.statSync(filePath);
+      console.log(`stats : ${JSON.stringify(stats)}`)
+      console.log(`stats.mtime.getTime : ${stats.mtime.getTime()}`)
+      return (
+        /\.(jpg|jpeg|png|gif)$/i.test(file) &&
+        stats.mtime.getTime() >= uploadFromTimestamp
+      );
     });
 
     if (files.length === 0) {
