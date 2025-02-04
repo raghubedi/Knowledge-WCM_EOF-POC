@@ -35,10 +35,10 @@ async function uploadImagesToContentful(imagesPath) {
     const files = fs.readdirSync(imagesPath).filter((file) => {
       const filePath = path.join(imagesPath, file);
       
-      // ✅ Get last commit date of the file using Git
       try {
-        const gitLog = execSync(`git log -1 --format="%ct" -- "${filePath}"`).toString().trim();
-        const commitTimestamp = parseInt(gitLog, 10) * 1000;  // Convert to milliseconds
+        const gitLog = execSync(`git log -1 --follow --format="%cd" --date=iso-strict -- "${filePath}"`).toString().trim();
+        console.log(`gitLog: ${JSON.stringify(gitLog)}`);
+        const commitTimestamp = parseInt(gitLog, 10) * 1000;
 
         console.log(`File: ${file}, Commit Date: ${new Date(commitTimestamp)}`);
 
