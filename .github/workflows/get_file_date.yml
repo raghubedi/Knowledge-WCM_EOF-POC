@@ -10,9 +10,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Get file date
-        id: set_date  # Assign an ID to the step
-        working-directory: ./repo
+        id: set_date
         run: |
+          cd ./repo
           date_utc=$(git log -n 1 --format="%cd" --date=iso-strict --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | cut -d ' ' -f 1-4)
           echo "date=$date_utc" >> $GITHUB_OUTPUT
 
