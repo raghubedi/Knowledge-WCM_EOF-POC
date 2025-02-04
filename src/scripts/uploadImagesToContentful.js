@@ -25,27 +25,15 @@ const getSizeLabel = (imagesPath) => {
 }
 async function uploadImagesToContentful(imagesPath) {
   console.log("Uploading Images start...");
-  const uploadFromDate = process.env.UPLOAD_FROM_DATE+'T00:00:00.000Z' || "2025-02-02T00:00:00.000Z";
-  const uploadFromTimestamp = new Date(uploadFromDate).getTime();
-  console.log(`Uploading Images created on or after ${uploadFromDate}`);
-  console.log(`uploadFromTimestamp ${uploadFromTimestamp}`);
   try {
     const environment = await getContentfulEnvironment();
 
-    const files = fs.readdirSync(imagesPath).filter((file) => {
-      const filePath = path.join(imagesPath, file);
-      
-      const stats = fs.statSync(filePath);
-      console.log(`stats : ${JSON.stringify(stats)}`)
-      console.log(`stats.mtime.getTime : ${stats.mtime.getTime()}`)
-      return (
-        /\.(jpg|jpeg|png|gif)$/i.test(file) &&
-        stats.mtime.getTime() >= uploadFromTimestamp
-      );
-    });
+    const files = fs.readdirSync(imagesPath).filter((file) =>
+          /\.(jpg|jpeg|png)$/i.test(file)
+        );
 
     if (files.length === 0) {
-      console.log(`❌ No images found after date ${uploadFromDate}`);
+      console.log(`❌ No images found`);
       return;
     }
 

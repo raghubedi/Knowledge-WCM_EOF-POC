@@ -2,11 +2,6 @@ name: Upload Swatch Images to Contentful
 
 on:
   workflow_dispatch:
-    inputs:
-      upload_from_date:
-        description: 'Upload swatch images created after this date(inclusive) (format: YYYY-MM-DD)'
-        required: true
-        default: '2000-01-01'
 
 jobs:
   upload-to-pt:
@@ -30,7 +25,6 @@ jobs:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-          UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
         run: node src/scripts/uploadSwatchesToContentful.js
 
   upload-to-prod:
@@ -57,5 +51,4 @@ jobs:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-          UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
         run: node src/scripts/uploadSwatchesToContentful.js

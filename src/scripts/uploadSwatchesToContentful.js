@@ -9,20 +9,12 @@ console.log(`SWATCH_IMAGE_FOLDER_PATH: ${SWATCH_IMAGE_FOLDER_PATH}`);
 
 async function uploadSwatchesToContentful() {
   console.log("Uploading Swatch Images start...");
-  const uploadFromDate = process.env.UPLOAD_FROM_DATE || "2020-01-01";
-  const uploadFromTimestamp = new Date(uploadFromDate).getTime();
-  console.log(`Uploading Images created on or after ${uploadFromDate}`);
   try {
     const environment = await getContentfulEnvironment();
 
-    const files = fs.readdirSync(SWATCH_IMAGE_FOLDER_PATH).filter((file) => {
-        const filePath = path.join(SWATCH_IMAGE_FOLDER_PATH, file);
-        const stats = fs.statSync(filePath);
-        return (
-          /\.(jpg|jpeg|png|gif)$/i.test(file) &&
-          stats.birthtime.getTime() >= uploadFromTimestamp
-        );
-      });
+    const files = fs.readdirSync(imagesPath).filter((file) =>
+      /\.(jpg|jpeg|png)$/i.test(file)
+    );
 
     if (files.length === 0) {
       console.log("❌ No Swatch images found in the folder!");
