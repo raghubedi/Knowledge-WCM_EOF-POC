@@ -12,7 +12,7 @@ async function uploadSwatchesToContentful() {
   try {
     const environment = await getContentfulEnvironment();
 
-    const files = fs.readdirSync(imagesPath).filter((file) =>
+    const files = fs.readdirSync(SWATCH_IMAGE_FOLDER_PATH).filter((file) =>
       /\.(jpg|jpeg|png)$/i.test(file)
     );
 
