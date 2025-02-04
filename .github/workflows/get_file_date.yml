@@ -12,5 +12,6 @@ jobs:
           path: repo
 
       - name: Get file date
+        working-directory: ./repo
         run: |
-          git log --diff-filter=A --format="%cd" --date=iso-strict --find-copies-harder -1 -- "repo/DeviceImages/200/LAIP12P128SL.jpg"
+          git log --diff-filter=A ... "DeviceImages/200/LAIP12P128SL.jpg"
