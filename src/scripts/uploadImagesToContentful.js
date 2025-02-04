@@ -35,21 +35,13 @@ async function uploadImagesToContentful(imagesPath) {
     const files = fs.readdirSync(imagesPath).filter((file) => {
       const filePath = path.join(imagesPath, file);
       
-      try {
-        const gitLog = execSync(`git log -1 --follow --format="%cd" --date=iso-strict -- "${filePath}"`).toString().trim();
-        console.log(`gitLog: ${JSON.stringify(gitLog)}`);
-        const commitTimestamp = parseInt(gitLog, 10) * 1000;
-
-        console.log(`File: ${file}, Commit Date: ${new Date(commitTimestamp)}`);
-
-        return (
-          /\.(jpg|jpeg|png|gif)$/i.test(file) &&
-          commitTimestamp >= uploadFromTimestamp
-        );
-      } catch (error) {
-        console.warn(`⚠️ Could not retrieve commit date for: ${file}`);
-        return false;
-      }
+      const stats = fs.statSync(filePath);
+      console.log(`stats : ${JSON.stringify(stats)}`)
+      console.log(`stats.mtime.getTime : ${stats.mtime.getTime()}`)
+      return (
+        /\.(jpg|jpeg|png|gif)$/i.test(file) &&
+        stats.mtime.getTime() >= uploadFromTimestamp
+      );
     });
 
     if (files.length === 0) {
