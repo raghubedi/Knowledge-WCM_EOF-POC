@@ -46,9 +46,11 @@ async function checkAndUploadImage(environment, imagesPath, filePath) {
   console.log(`checkAndUploadImage --> fileName :: ${fileName}`);
   let imageTitle = path.basename(fileName, path.extname(fileName));
   console.log(`checkAndUploadImage --> imageTitle :: ${imageTitle}`);
+  console.log(`checkAndUploadImage --> environment :: ${environment}`);
+  console.log(`checkAndUploadImage --> environment :: ${JSON.stringify(environment)}`);
   
   try {
-    
+
     const assets = await environment.getAssets({ "fields.title[match]": imageTitle });
     let asset = assets.items.length > 0 ? assets.items[0] : null;
 
