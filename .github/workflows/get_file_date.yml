@@ -16,7 +16,7 @@ jobs:
         run: |
           REPO_DIR="${{ github.workspace }}/repo"
           cd "$REPO_DIR"
-          date_utc=$(git log -n 1 --format="%cd" --date='format:%Y-%m-%dT%H:%M:%SZ' --follow -- "DeviceImages/200/LAIP12P128SL.jpg")
+          date_utc=$(git log -n 1 --format="%cd" --date='format-utc:%Y-%m-%dT%H:%M:%SZ' --follow -- "DeviceImages/200/LAIP12P128SL.jpg")
           echo "date=$date_utc" >> $GITHUB_OUTPUT
 
       - name: Use the output
