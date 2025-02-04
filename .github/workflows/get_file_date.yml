@@ -12,14 +12,18 @@ jobs:
           path: repo
           ref: main
 
+      - name: List files
+        working-directory: ./repo
+        run: ls -l repo/DeviceImages/200/LAIP12P128SL.jpg
+
       - name: Get file date
         working-directory: ./repo
         run: |
-          export TZ=UTC  # Set timezone explicitly (important!)
-          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
+          export TZ=UTC
+          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 --follow -- "DeviceImages/200/LAIP12P128SL.jpg" | sed 's/-\d\d:\d\d$//')
           echo "File date (UTC): $date"
-
+    
       - name: Verify commit (for debugging)
         working-directory: ./repo
         run: |
-          git log -p "DeviceImages/200/LAIP12P128SL.jpg"  # Check commit details
+          git log -p "DeviceImages/200/LAIP12P128SL.jpg"
