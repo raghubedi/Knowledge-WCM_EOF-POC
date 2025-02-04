@@ -37,8 +37,8 @@ async function uploadImagesToContentful(imagesPath) {
       
       try {
         const gitLog = execSync(`git log -1 --follow --format="%cd" --date=iso-strict -- "${filePath}"`).toString().trim();
-        console.log(`gitLog: ${JSON.stringify(gitLog)}`);
-        const commitTimestamp = parseInt(gitLog, 10) * 1000;
+        console.log(`gitLogs: ${JSON.stringify(gitLog)}`);
+        const commitTimestamp = new Date(gitLog).getTime();
 
         console.log(`File: ${file}, Commit Date: ${new Date(commitTimestamp)}`);
 
