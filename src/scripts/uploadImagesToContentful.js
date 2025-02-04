@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require("child_process");
 const { getContentfulEnvironment } = require("../contentful/ContentfulEnv");
 const {productCodeToColor} = require("../constants/constants");
 
@@ -33,13 +34,22 @@ async function uploadImagesToContentful(imagesPath) {
 
     const files = fs.readdirSync(imagesPath).filter((file) => {
       const filePath = path.join(imagesPath, file);
-      const stats = fs.statSync(filePath);
-      console.log(`stats : ${JSON.stringify(stats)}`)
-      console.log(`stats.mtime.getTime : ${stats.mtime.getTime()}`)
-      return (
-        /\.(jpg|jpeg|png|gif)$/i.test(file) &&
-        stats.mtime.getTime() >= uploadFromTimestamp
-      );
+      
+      // ✅ Get last commit date of the file using Git
+      try {
+        const gitLog = execSync(`git log -1 --format="%ct" -- "${filePath}"`).toString().trim();
+        const commitTimestamp = parseInt(gitLog, 10) * 1000;  // Convert to milliseconds
+
+        console.log(`File: ${file}, Commit Date: ${new Date(commitTimestamp)}`);
+
+        return (
+          /\.(jpg|jpeg|png|gif)$/i.test(file) &&
+          commitTimestamp >= uploadFromTimestamp
+        );
+      } catch (error) {
+        console.warn(`⚠️ Could not retrieve commit date for: ${file}`);
+        return false;
+      }
     });
 
     if (files.length === 0) {
