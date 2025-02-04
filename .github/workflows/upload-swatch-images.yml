@@ -27,7 +27,7 @@ jobs:
       - name: Run Upload Script
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
-          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_ENV_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
           UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
         run: node src/scripts/uploadSwatchesToContentful.js
