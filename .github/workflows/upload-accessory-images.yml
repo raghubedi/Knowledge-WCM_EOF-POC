@@ -1,0 +1,61 @@
+name: Upload Device Images to Contentful
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_from_date:
+        description: 'Upload images created after this date (inclusive) (format: YYYY-MM-DD)'
+        required: true
+        default: '2000-01-01'
+
+jobs:
+  upload-to-pt:
+    name: Upload Accessory Images to PT
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Upload Script for PT
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+          UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
+        run: node src/scripts/uploadAccessoryImagesToContentful.js
+
+  upload-to-prod:
+    name: Upload Accessory Images to Prod
+    runs-on: ubuntu-latest
+    needs: upload-to-pt
+    environment:
+      name: Prod
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Upload Script for Prod
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+          UPLOAD_FROM_DATE: ${{ github.event.inputs.upload_from_date }}
+        run: node src/scripts/uploadAccessoryImagesToContentful.js
