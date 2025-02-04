@@ -14,4 +14,5 @@ jobs:
       - name: Get file date
         working-directory: ./repo
         run: |
-          git log --diff-filter=A ... "DeviceImages/200/LAIP12P128SL.jpg"
+          date=$(git log --format="%cd" --date=iso-strict --find-copies-harder -1 -- "DeviceImages/200/LAIP12P128SL.jpg")
+          echo "File date: $date"
