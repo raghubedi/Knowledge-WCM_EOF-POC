@@ -20,12 +20,12 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Upload Script for PT
+      - name: Upload Script for PT
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: node src/scripts/runAllScritps.js
+        run: node src/scripts/runAllScripts.js
 
   upload-to-prod:
     name: Upload All Images to Prod
@@ -46,9 +46,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Upload Script for Prod
+      - name: Upload Script for Prod
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: node src/scripts/runAllScritps.js
+        run: node src/scripts/runAllScripts.js
