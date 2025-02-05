@@ -184,9 +184,10 @@ function getContentType(fileName) {
   return types[ext] || "application/octet-stream";
 }
 
-const runUploadImagesProgram = async() => {
+const uploadAccessoryImages = async() => {
   await uploadImagesToContentful(LARGE_IMAGE_FOLDER_PATH);
   await uploadImagesToContentful(SMALL_IMAGE_FOLDER_PATH);
 }
 
-runUploadImagesProgram();
+// uploadAccessoryImages();
+module.exports = { uploadAccessoryImages };

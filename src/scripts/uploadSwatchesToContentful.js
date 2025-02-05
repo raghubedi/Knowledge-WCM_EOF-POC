@@ -7,7 +7,7 @@ console.log(`projectRoot: ${projectRoot}`);
 const SWATCH_IMAGE_FOLDER_PATH = path.join(projectRoot, 'DeviceImages/swatches');
 console.log(`SWATCH_IMAGE_FOLDER_PATH: ${SWATCH_IMAGE_FOLDER_PATH}`);
 
-async function uploadSwatchesToContentful() {
+async function uploadSwatches() {
   console.log("Uploading Swatch Images start...");
   try {
     const environment = await getContentfulEnvironment();
@@ -130,4 +130,5 @@ function getContentType(fileName) {
   return types[ext] || "application/octet-stream";
 }
 
-uploadSwatchesToContentful();
+// uploadSwatches();
+module.exports = { uploadSwatches };

@@ -1,0 +1,54 @@
+name: Upload All Images to Contentful
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-to-pt:
+    name: Upload All Images to PT
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Upload Script for PT
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+        run: node src/scripts/runAllScritps.js
+
+  upload-to-prod:
+    name: Upload All Images to Prod
+    runs-on: ubuntu-latest
+    needs: upload-to-pt
+    environment:
+      name: Prod
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Upload Script for Prod
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+        run: node src/scripts/runAllScritps.js
