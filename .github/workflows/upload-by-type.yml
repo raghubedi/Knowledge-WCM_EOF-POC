@@ -3,16 +3,16 @@ name: Upload Images By Type
 on:
   workflow_dispatch:
     inputs:
-      script_file:
+      script_name:
         description: "Select the script to run"
         required: true
-        default: "runAllScripts.js"
+        default: "Upload Everything"
         type: choice
         options:
-          - "uploadAccessoryImagesToContentful.js"
-          - "uploadSwatchesToContentful.js"
-          - "uploadImagesToContentful.js"
-          - "runAllScripts.js"
+          - "Upload Accessories"
+          - "Upload Swatches"
+          - "Upload Devices"
+          - "Upload Everything"
 
 jobs:
   upload-to-np:
@@ -31,17 +31,23 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Debug and List Scripts
-        run: ls -l src/scripts  # Ensure the scripts exist
+      - name: Map Selected Option to Script
+        id: script_mapping
+        run: |
+          case "${{ github.event.inputs.script_name }}" in
+            "Upload Accessories") script_file="uploadAccessoryImagesToContentful.js" ;;
+            "Upload Swatches") script_file="uploadSwatchesToContentful.js" ;;
+            "Upload Devices") script_file="uploadImagesToContentful.js" ;;
+            "Upload Everything") script_file="runAllScripts.js" ;;
+          esac
+          echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
 
-      - name: Run Selected Script in NP
+      - name: Run Selected Script in PT
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: |
-          echo "Running script: ${{ github.event.inputs.script_file }}"
-          node src/scripts/${{ github.event.inputs.script_file }}
+        run: node src/scripts/$SCRIPT_FILE
 
   upload-to-prod:
     name: Upload to Prod
@@ -67,6 +73,4 @@ jobs:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: |
-          echo "Running script: ${{ github.event.inputs.script_file }}"
-          node src/scripts/${{ github.event.inputs.script_file }}
+        run: node src/scripts/$SCRIPT_FILE

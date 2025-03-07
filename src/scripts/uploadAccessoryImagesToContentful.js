@@ -189,5 +189,5 @@ const uploadAccessoryImages = async() => {
   await uploadImagesToContentful(SMALL_IMAGE_FOLDER_PATH);
 }
 
-// uploadAccessoryImages();
+uploadAccessoryImages();
 module.exports = { uploadAccessoryImages };
