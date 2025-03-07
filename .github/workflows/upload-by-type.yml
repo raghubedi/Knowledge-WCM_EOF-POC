@@ -3,16 +3,16 @@ name: Upload Images By Type
 on:
   workflow_dispatch:
     inputs:
-      script_name:
+      script_file:
         description: "Select the script to run"
         required: true
-        default: "Upload Everything"
+        default: "runAllScripts.js"
         type: choice
         options:
-          - "Upload Accessories"
-          - "Upload Swatches"
-          - "Upload Devices"
-          - "Upload Everything"
+          - "uploadAccessoryImagesToContentful.js"
+          - "uploadSwatchesToContentful.js"
+          - "uploadImagesToContentful.js"
+          - "runAllScripts.js"
 
 jobs:
   upload-to-np:
@@ -31,27 +31,17 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Map Selected Option to Script
-        id: script_mapping
-        run: |
-          case "${{ github.event.inputs.script_name }}" in
-            "Upload Accessories") script_file="uploadAccessoryImagesToContentful.js" ;;
-            "Upload Swatches") script_file="uploadSwatchesToContentful.js" ;;
-            "Upload Devices") script_file="uploadImagesToContentful.js" ;;
-            "Upload Everything") script_file="runAllScripts.js" ;;
-          esac
-          echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
-          echo "Mapped script: $script_file"
+      - name: Debug and List Scripts
+        run: ls -l src/scripts  # Ensure the scripts exist
 
-      - name: Run Selected Script in PT
+      - name: Run Selected Script in NP
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
         run: |
-          echo "Running script: $SCRIPT_FILE"
-          ls -l src/scripts  # Debugging: List files to ensure script exists
-          node src/scripts/${SCRIPT_FILE}  # Correct expansion
+          echo "Running script: ${{ github.event.inputs.script_file }}"
+          node src/scripts/${{ github.event.inputs.script_file }}
 
   upload-to-prod:
     name: Upload to Prod
@@ -78,6 +68,5 @@ jobs:
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
         run: |
-          echo "Running script: $SCRIPT_FILE"
-          ls -l src/scripts  # Debugging: List files to ensure script exists
-          node src/scripts/${SCRIPT_FILE}  # Correct expansion
+          echo "Running script: ${{ github.event.inputs.script_file }}"
+          node src/scripts/${{ github.event.inputs.script_file }}
