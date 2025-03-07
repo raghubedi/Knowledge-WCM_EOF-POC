@@ -39,12 +39,20 @@ jobs:
             "Upload Swatches") script_file="uploadSwatchesToContentful.js" ;;
             "Upload Devices") script_file="uploadImagesToContentful.js" ;;
             "Upload Everything") script_file="runAllScripts.js" ;;
+            *) echo "Invalid option selected"; exit 1 ;;
           esac
           echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
-          echo "script_file=$script_file" >> $GITHUB_OUTPUT  # Export for next job
+          echo "script_file=$script_file" >> $GITHUB_OUTPUT
 
-    outputs:
-      selected_script: ${{ steps.script_mapping.outputs.script_file }}  # Pass script name to next job
+      - name: Debug Script Selection
+        run: echo "Script selected: $SCRIPT_FILE"
+
+      - name: Run Selected Script in PT
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+        run: node src/scripts/$SCRIPT_FILE
 
   upload-to-prod:
     name: Upload to Prod
@@ -65,9 +73,25 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Map Selected Option to Script (for Prod)
+        id: script_mapping_prod
+        run: |
+          case "${{ github.event.inputs.script_name }}" in
+            "Upload Accessories") script_file="uploadAccessoryImagesToContentful.js" ;;
+            "Upload Swatches") script_file="uploadSwatchesToContentful.js" ;;
+            "Upload Devices") script_file="uploadImagesToContentful.js" ;;
+            "Upload Everything") script_file="runAllScripts.js" ;;
+            *) echo "Invalid option selected"; exit 1 ;;
+          esac
+          echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
+          echo "script_file=$script_file" >> $GITHUB_OUTPUT
+
+      - name: Debug Script Selection (Prod)
+        run: echo "Script selected for Prod: $SCRIPT_FILE"
+
       - name: Run Selected Script in Prod
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: node src/scripts/${{ needs.upload-to-np.outputs.selected_script }}
+        run: node src/scripts/$SCRIPT_FILE
