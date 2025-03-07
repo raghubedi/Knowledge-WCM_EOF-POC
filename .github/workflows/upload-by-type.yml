@@ -1,0 +1,76 @@
+name: Upload Images to Contentful
+
+on:
+  workflow_dispatch:
+    inputs:
+      script_name:
+        description: "Select the script to run"
+        required: true
+        default: "runAllScripts"
+        type: choice
+        options:
+          - "Upload Accessories"
+          - "Upload Swatches"
+          - "Upload Devices"
+          - "Upload Everything"
+
+jobs:
+  upload-to-np:
+    name: Upload to Non-Prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Map Selected Option to Script
+        id: script_mapping
+        run: |
+          case "${{ github.event.inputs.script_name }}" in
+            "Upload Accessories") script_file="uploadAccessoryImagesToContentful.js" ;;
+            "Upload Swatches") script_file="uploadSwatchesToContentful.js" ;;
+            "Upload Devices") script_file="uploadImagesToContentful.js" ;;
+            "Upload Everything") script_file="runAllScripts.js" ;;
+          esac
+          echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
+
+      - name: Run Selected Script in PT
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+        run: node src/scripts/$SCRIPT_FILE
+
+  upload-to-prod:
+    name: Upload to Prod
+    runs-on: ubuntu-latest
+    needs: upload-to-np
+    environment:
+      name: Prod
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Selected Script in Prod
+        env:
+          SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
+          ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+        run: node src/scripts/$SCRIPT_FILE
