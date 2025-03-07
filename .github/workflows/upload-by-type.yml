@@ -19,6 +19,9 @@ jobs:
     name: Upload to Non-Prod
     runs-on: ubuntu-latest
 
+    outputs:
+      script_file: ${{ steps.script_mapping.outputs.script_file }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -40,14 +43,15 @@ jobs:
             "Upload Devices") script_file="uploadImagesToContentful.js" ;;
             "Upload Everything") script_file="runAllScripts.js" ;;
           esac
-          echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
+          echo "script_file=$script_file" >> $GITHUB_ENV
+          echo "script_file=$script_file" >> $GITHUB_OUTPUT  # Store as output
 
       - name: Run Selected Script in PT
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: node src/scripts/$SCRIPT_FILE
+        run: node src/scripts/$script_file
 
   upload-to-prod:
     name: Upload to Prod
@@ -73,4 +77,5 @@ jobs:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+          SCRIPT_FILE: ${{ needs.upload-to-np.outputs.script_file }}
         run: node src/scripts/$SCRIPT_FILE
