@@ -39,23 +39,15 @@ jobs:
             "Upload Swatches") script_file="uploadSwatchesToContentful.js" ;;
             "Upload Devices") script_file="uploadImagesToContentful.js" ;;
             "Upload Everything") script_file="runAllScripts.js" ;;
-            *) echo "Invalid selection"; exit 1 ;;
           esac
           echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
-          echo "Mapped script: $script_file"  # Debugging output
-
-      - name: Debug Script Path
-        run: echo "Script to run: $SCRIPT_FILE"
 
       - name: Run Selected Script in PT
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: |
-          echo "Running script: $SCRIPT_FILE"
-          ls -l src/scripts  # Check if the script exists
-          node src/scripts/$SCRIPT_FILE
+        run: node src/scripts/$SCRIPT_FILE
 
   upload-to-prod:
     name: Upload to Prod
@@ -81,7 +73,4 @@ jobs:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: |
-          echo "Running script: $SCRIPT_FILE"
-          ls -l src/scripts  # Check if the script exists
-          node src/scripts/$SCRIPT_FILE
+        run: node src/scripts/$SCRIPT_FILE
