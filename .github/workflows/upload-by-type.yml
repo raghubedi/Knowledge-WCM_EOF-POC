@@ -41,13 +41,17 @@ jobs:
             "Upload Everything") script_file="runAllScripts.js" ;;
           esac
           echo "SCRIPT_FILE=$script_file" >> $GITHUB_ENV
+          echo "Mapped script: $script_file"
 
       - name: Run Selected Script in PT
         env:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PT_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: node src/scripts/$SCRIPT_FILE
+        run: |
+          echo "Running script: $SCRIPT_FILE"
+          ls -l src/scripts  # Debugging: List files to ensure script exists
+          node src/scripts/${SCRIPT_FILE}  # Correct expansion
 
   upload-to-prod:
     name: Upload to Prod
@@ -73,4 +77,7 @@ jobs:
           SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           ENVIRONMENT_ID: ${{ secrets.CONTENTFUL_PROD_ENV_ID }}
           ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-        run: node src/scripts/$SCRIPT_FILE
+        run: |
+          echo "Running script: $SCRIPT_FILE"
+          ls -l src/scripts  # Debugging: List files to ensure script exists
+          node src/scripts/${SCRIPT_FILE}  # Correct expansion
